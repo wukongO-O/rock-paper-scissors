@@ -1,62 +1,83 @@
+const buttons = document.querySelectorAll('button');
+const container = document.querySelector('#container');
+const display = document.querySelector('#display');
+const result = document.querySelector('#result');
+const replay = document.querySelector('#reset');
+let playerSelection;
+let computerSelection;
+let yourScore = 0;
+let pcScore = 0;
+
 function computerPlay() {
-    const play = ['Rock', 'Paper', 'Scissors'];
+    const play = ['rock', 'paper', 'scissors'];
     let result = play[Math.floor(Math.random()* 3)];
     return result;
 }
 
 function playRound(playerSelection, computerSelection) { 
-    playerSelection = prompt("Pick 1 of the followings: rock, paper, scissors");
-    computerSelection = computerPlay();
-    if (computerSelection === 'Paper' && playerSelection.toLowerCase() === 'rock') {
-        return (-1);
-    } else if (computerSelection === 'Paper' && playerSelection.toLowerCase() === 'paper') {
+    if (playerSelection === computerSelection) {
         return (0);
-    } else if (computerSelection === 'Paper'&& playerSelection.toLowerCase() === 'scissors') {
-        return (1);
-    } else if (computerSelection === 'Rock' && playerSelection.toLowerCase() === 'rock') {
-        return (0); 
-    } else if (computerSelection === 'Rock' && playerSelection.toLowerCase() === 'paper') {
-        return (1);
-    } else if (computerSelection === 'Rock' && playerSelection.toLowerCase() === 'scissors') {
+    } else if (computerSelection == 'paper' && playerSelection == 'rock' ||
+     computerSelection == 'rock' && playerSelection == 'scissors' ||
+     computerSelection == 'scissors' && playerSelection == 'paper') {
         return (-1);
-    } else if (computerSelection === 'Scissors' && playerSelection.toLowerCase() === 'rock') {
-        return (1);
-    } else if (computerSelection === 'Scissors' && playerSelection.toLowerCase() === 'paper') {
-        return (-1);
-    } else if (computerSelection === 'Scissors' && playerSelection.toLowerCase() === 'scissors'){
-        return (0);    
-    } else {
-        alert('I do not understand.')
-    }
+    } else if (computerSelection == 'paper'&& playerSelection == 'scissors' || 
+     computerSelection == 'rock' && playerSelection == 'paper' ||
+     computerSelection == 'scissors' && playerSelection == 'rock') {
+        return (1);   
+    } 
 }
 
 function game() {
-    let yourScore = 0;
-    let pcScore = 0;
-    for (let i = 0; i < 5; i++) {
-        let result = playRound();
-        if (result === 1) {
-            yourScore += 1;
-            pcScore += 0;
-        } else if (result === -1) {
-            yourScore += 0;
-            pcScore += 1;
-        } else if (result === 0) {
-            yourScore +=0;
-            pcScore += 0;
-        } else {
-            alert('invalid');
-        }
+    let result = playRound(playerSelection, computerSelection);
+    if (result === 1) {
+        yourScore += 1;
+        pcScore += 0;
+    } else if (result === -1) {
+        yourScore += 0;
+        pcScore += 1;
+    } else if (result === 0) {
+        yourScore +=1;
+        pcScore += 1;
+    };
+    display.textContent = `You scored ${yourScore} : computer scored ${pcScore}`;
+};
 
-        console.log(`You scored ${yourScore} : computer ${pcScore}`);
-    }
-    
-    if (yourScore > pcScore) {
-        return (`You won! You scored ${yourScore} : computer ${pcScore}`);
-    } else if (yourScore < pcScore) {
-        return (`You lost! You scored ${yourScore} : computer ${pcScore}`);
+function final() {
+    if (yourScore == 5 || pcScore == 5) {
+        if (yourScore > pcScore) {
+            result.textContent = `You won this round! You scored ${yourScore} : computer scored ${pcScore}`;
+        } else if (yourScore < pcScore) {
+            result.textContent = `You lost this round! You scored ${yourScore} : computer scored ${pcScore}`;
+        } 
+    }  
+};
+
+function reset() {
+    let replay;
+    if (confirm('Play again?') == true) {
+        replay = 'OK';
+        display.textContent = '';
+        result.textContent = '';
+        yourScore = 0;
+        pcScore = 0;
     } else {
-        return (`It's a tie! You scored ${yourScore} : computer ${pcScore}`);
+        replay = 'Nah';
     }
-}
-console.log(game());
+};
+
+buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+        if (yourScore < 5 && pcScore < 5) {
+            playerSelection = button.id;
+            computerSelection = computerPlay();
+            playRound(playerSelection, computerSelection);
+            game();
+            final(); 
+        }   
+    });
+});
+
+replay.addEventListener('click', () => {
+  reset();
+});
